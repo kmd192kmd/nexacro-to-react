@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.chapter1.mapper.EmpMapper">
+
+    <!-- 전체 조회 -->
+    <select id="findAll"
+            resultType="Emp">
+
+        SELECT
+            emp_id,
+            emp_name,
+            dept_code,
+            position,
+            hire_date,
+            salary,
+            gender,
+            married,
+            skill,
+            hobby,
+            memo
+        FROM ds_emp
+        ORDER BY emp_id
+
+    </select>
+
+
+    <!-- 상세 조회 -->
+    <select id="findById"
+            parameterType="String"
+            resultType="Emp">
+
+        SELECT
+            emp_id,
+            emp_name,
+            dept_code,
+            position,
+            hire_date,
+            salary,
+            gender,
+            married,
+            skill,
+            hobby,
+            memo
+        FROM ds_emp
+        WHERE emp_id = #{empId}
+
+    </select>
+
+
+    <!-- 등록 -->
+    <insert id="insert"
+            parameterType="Emp">
+
+        INSERT INTO ds_emp (
+            emp_id,
+            emp_name,
+            dept_code,
+            position,
+            hire_date,
+            salary,
+            gender,
+            married,
+            skill,
+            hobby,
+            memo
+        )
+        VALUES (
+            #{empId},
+            #{empName},
+            #{deptCode},
+            #{position},
+            #{hireDate},
+            #{salary},
+            #{gender},
+            #{married},
+            #{skill},
+            #{hobby},
+            #{memo}
+        )
+
+    </insert>
+
+
+    <!-- 수정 -->
+    <update id="update"
+            parameterType="Emp">
+
+        UPDATE ds_emp
+        SET
+            emp_name = #{empName},
+            dept_code = #{deptCode},
+            position = #{position},
+            hire_date = #{hireDate},
+            salary = #{salary},
+            gender = #{gender},
+            married = #{married},
+            skill = #{skill},
+            hobby = #{hobby},
+            memo = #{memo}
+        WHERE emp_id = #{empId}
+
+    </update>
+
+
+    <!-- 삭제 -->
+    <delete id="delete"
+            parameterType="String">
+
+        DELETE FROM ds_emp
+        WHERE emp_id = #{empId}
+
+    </delete>
+
+</mapper>
