@@ -1,24 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './MainPage.css'
 import { getEmployees } from "../../api/empApi";
-import type { Employee, EmployeeForm } from '../../types/employee';
+import type { Employee } from '../../types/employee';
 import { Search } from 'lucide-react';
-import { DEPARTMENT_MAP, GENDER_MAP, HOBBY_MAP, POSITION_MAP, SKILL_MAP, SKILL_OPTIONS } from '../../constants/codeMap';
+import EmployeeRow from './EmployeeRow';
 
 function MainPage() {
   const [emp, setEmp] = useState<Employee[]>([]);
-  const [form, setForm] = useState<EmployeeForm>({
-    position: [],
-    skill: [],
-    hobby: [],
-    married: false,
-  });
-
-  const [skillOpen, setSkillOpen] = useState(false);
-
-  const toArray = (value: string | null) => {
-    return value ? value.split(",") : [];
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,16 +18,25 @@ function MainPage() {
     fetchData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
+  const handleChange = useCallback((
+    empId: number,
+    field: "skill" | "hobby" | "position",
+    value: string
+  ) => {
+    setEmp((prev) =>
+      prev.map((employee) => {
+        if (employee.empId !== empId) {
+          return employee;
+        }
 
-    setForm((prev) => ({
-      ...prev,
-      skill: checked
-        ? [...prev.skill, value]
-        : prev.skill.filter((code) => code !== value),
-    }))
-  };
+        return {
+          ...employee,
+          [field]: value,
+        };
+      })
+    );
+  }, []
+  );
 
   return (
     <>
@@ -116,50 +113,12 @@ function MainPage() {
 
           <tbody>
             {emp.map((employee, index) => (
-              <tr key={employee.empId}>
-                <td>{index + 1}</td>
-                <td>{employee.empName}</td>
-                <td>{employee.empId}</td>
-                <td>{DEPARTMENT_MAP[employee.deptCode]}</td>
-                <td>{POSITION_MAP[employee.position]}</td>
-                <td>{employee.hireDate}</td>
-                <td>{employee.salary.toLocaleString()}</td>
-                <td>{GENDER_MAP[employee.gender]}</td>
-                <td>{employee.married}</td>
-
-                <div className="multi-select">
-                  <button
-                    type="button"
-                    className="select-button"
-                    onClick={() => setSkillOpen((prev) => !prev)}>
-                    <span>
-                      {form.skill.length > 0
-                        ? form.skill
-                          .map((code) => SKILL_MAP[code])
-                          .join(", ")
-                        : "스킬 선택"}
-                    </span>
-                    <span>▼</span>
-                  </button>
-
-                  {skillOpen && (
-                    <div className="options">
-                      {SKILL_OPTIONS.map((skill) => (
-                        <label key={skill.code} className="option">
-                          <input
-                            type="checkbox"
-                            checked={form.skill.includes(skill.code)}
-                            onChange={handleChange}
-                          />
-                          <span>{skill.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <td>{HOBBY_MAP[employee.hobby ?? ""]}</td>
-              </tr>
+              <EmployeeRow
+                key={employee.empId}
+                employee={employee}
+                index={index}
+                onChange={handleChange}
+              />
             ))}
           </tbody>
         </table>
