@@ -24,6 +24,8 @@
             memo
         FROM ds_emp
         ORDER BY emp_id
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{size} ROWS ONLY
 
     </select>
 

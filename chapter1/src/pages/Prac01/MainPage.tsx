@@ -4,18 +4,78 @@ import { getEmployees } from "../../api/empApi";
 import type { Employee } from '../../types/employee';
 import { Search } from 'lucide-react';
 import EmployeeRow from './EmployeeRow';
+import Detail from './Detail';
 
 function MainPage() {
   const [emp, setEmp] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const pageRef = useRef(0);
+  const loadingRef = useRef(false);
+  const hasMoreRef = useRef(true);
+
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  const loadEmployees = async () => {
+    if (loadingRef.current) return;
+
+    if (!hasMoreRef.current) return;
+
+    loadingRef.current = true;
+    setLoading(true);
+
+    try {
+      const response = await getEmployees(
+        pageRef.current,
+        50
+      );
+      console.log(response);
+      const newEmployees = response.data.content;
+
+      setEmp((prev) => [
+        ...prev,
+        ...newEmployees
+      ]);
+
+      hasMoreRef.current = !response.data.last;
+
+      pageRef.current += 1;
+
+    } catch (error) {
+      console.error("직원 조회 실패:", error);
+
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await getEmployees();
-      console.log(response);
-      setEmp(response.data);
-    };
+    loadEmployees();
+  }, []);
 
-    fetchData();
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadEmployees();
+        }
+      },
+      {
+        root: tableContainerRef.current,
+        threshold: 0.1,
+      }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   const handleChange = useCallback((
@@ -72,19 +132,19 @@ function MainPage() {
           <div className='gender-div'>Gender</div>
           <div className='gender-radio-wrapper'>
             <label>
-              <input type="radio" name="gender" className="gender-radio" value="all" defaultChecked /> All
+              <input type="radio" name="gender" className="gender-radio" value="all" defaultChecked />{' '}All
             </label>
           </div>
 
           <div className='gender-radio-wrapper'>
             <label>
-              <input type="radio" name="gender" className="gender-radio" value="male" /> Male
+              <input type="radio" name="gender" className="gender-radio" value="male" />{' '}Male
             </label>
           </div>
 
           <div className='gender-radio-wrapper'>
             <label>
-              <input type="radio" name="gender" className="gender-radio" value="female" /> Female
+              <input type="radio" name="gender" className="gender-radio" value="female" />{' '}Female
             </label>
           </div>
 
@@ -93,7 +153,10 @@ function MainPage() {
 
       <h3>List</h3>
 
-      <div className='table-container'>
+      <div
+        className='table-container'
+        ref={tableContainerRef}
+      >
         <table>
           <thead>
             <tr>
@@ -120,12 +183,28 @@ function MainPage() {
                 onChange={handleChange}
               />
             ))}
+
+            {/* 무한 스크롤 감시용 */}
+            <tr>
+              <td colSpan={11}>
+                <div
+                  ref={observerRef}
+                  className='scroll-observer'
+                >
+                  {loading && "Loading..."}
+                </div>
+              </td>
+            </tr>
+
           </tbody>
         </table>
       </div>
 
       <h3>Detail</h3>
-      세부사항 생성 예정
+      <Detail
+        employee={emp}
+        onChange={handleChange}
+      />
     </>
   )
 }

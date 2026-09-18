@@ -1,6 +1,7 @@
 package com.example.chapter1.controller;
 
 import com.example.chapter1.domain.Emp;
+import com.example.chapter1.domain.PageResponse;
 import com.example.chapter1.service.EmpService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,8 @@ public class EmpController {
 
     // 전체 조회
     @GetMapping
-    public List<Emp> findAll() {
-        return empService.findAll();
+    public PageResponse<Emp> findAll(@RequestParam int page, @RequestParam int size) {
+        return empService.findAll(page, size);
     }
 
     // 상세 조회

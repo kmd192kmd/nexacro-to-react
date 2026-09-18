@@ -1,7 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react';
-
 import type { Employee } from '../../types/employee';
-
+import './EmployeeRow.css'
 import {
   DEPARTMENT_MAP,
   GENDER_MAP,
@@ -53,11 +52,11 @@ function EmployeeRow({
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
 
-      const insideKill = skillRef.current?.contains(target);
+      const insideSkill = skillRef.current?.contains(target);
 
       const insideHobby = hobbyRef.current?.contains(target);
 
-      if(!insideKill && !insideHobby) {
+      if(!insideSkill && !insideHobby) {
         setOpen(null);
       }
     };

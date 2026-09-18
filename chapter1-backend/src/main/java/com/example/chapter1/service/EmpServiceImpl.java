@@ -1,6 +1,7 @@
 package com.example.chapter1.service;
 
 import com.example.chapter1.domain.Emp;
+import com.example.chapter1.domain.PageResponse;
 import com.example.chapter1.mapper.EmpMapper;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,18 @@ public class EmpServiceImpl implements EmpService {
     }
 
     @Override
-    public List<Emp> findAll() {
-        return empMapper.findAll();
+    public PageResponse<Emp> findAll(int page, int size) {
+        int offset = page * size;
+
+        List<Emp> employees = empMapper.findAll(offset, size + 1);
+
+        boolean hasMore = employees.size() > size;
+
+        if(hasMore) {
+            employees.remove(size);
+        }
+
+        return new PageResponse<>(employees, hasMore);
     }
 
     @Override

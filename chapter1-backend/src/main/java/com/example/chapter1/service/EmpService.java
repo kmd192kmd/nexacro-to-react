@@ -1,12 +1,11 @@
 package com.example.chapter1.service;
 
-import java.util.List;
-
 import com.example.chapter1.domain.Emp;
+import com.example.chapter1.domain.PageResponse;
 
 public interface EmpService {
 
-    List<Emp> findAll();
+    PageResponse<Emp> findAll(int page, int size);
 
     Emp findById(String empId);
 

@@ -1,7 +1,12 @@
-import commonApi from "./commonApi";
+import commonApi from "./commonApi"
 
-export const getEmployees = () => {
-    return commonApi.get("/emp");
+export const getEmployees = (page, size) => {
+    return commonApi.get("/emp", {
+        params: {
+            page,
+            size
+        },
+    });
 };
 
 export const getEmployee = (empId) => {

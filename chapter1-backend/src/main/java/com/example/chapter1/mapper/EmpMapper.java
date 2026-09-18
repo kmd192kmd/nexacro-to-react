@@ -9,7 +9,7 @@ import com.example.chapter1.domain.Emp;
 @Mapper 
 public interface EmpMapper {
 
-    List<Emp> findAll();
+    List<Emp> findAll(int offset, int size);
 
     Emp findById(String empId);
 
