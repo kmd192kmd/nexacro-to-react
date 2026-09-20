@@ -10,6 +10,8 @@ function MainPage() {
   const [emp, setEmp] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+
   const pageRef = useRef(0);
   const loadingRef = useRef(false);
   const hasMoreRef = useRef(true);
@@ -88,11 +90,13 @@ function MainPage() {
         if (employee.empId !== empId) {
           return employee;
         }
+        const updated = { ...employee, [field]: value };
 
-        return {
-          ...employee,
-          [field]: value,
-        };
+        setSelectedEmployee((currSelected) => 
+          currSelected?.empId === empId ? updated : currSelected
+        );
+
+        return updated;
       })
     );
   }, []
@@ -181,6 +185,8 @@ function MainPage() {
                 employee={employee}
                 index={index}
                 onChange={handleChange}
+                isSelected={selectedEmployee?.empId === employee.empId}
+                onSelect={() => setSelectedEmployee(employee)}
               />
             ))}
 
@@ -201,10 +207,12 @@ function MainPage() {
       </div>
 
       <h3>Detail</h3>
-      <Detail
-        employee={emp}
-        onChange={handleChange}
-      />
+      {selectedEmployee && (
+        <Detail
+          employee={selectedEmployee}
+          onChange={handleChange}
+        />
+      )}
     </>
   )
 }

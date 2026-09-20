@@ -113,3 +113,18 @@ th:nth-child(11) { width: 160px; }
 .scroll-observer {
   height: 1px;
 }
+
+.options-fixed {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 99999;
+  max-height: 220px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  font-size: 14px;
+}

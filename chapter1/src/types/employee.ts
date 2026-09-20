@@ -6,7 +6,7 @@ export interface Employee {
     hireDate: string;
     salary: number;
     gender: string;
-    married: boolean;
+    married: string; //본사 컴 DB에선 boolean? 
     skill: string | null;
     hobby: string | null;
     memo: string | null;
@@ -16,5 +16,5 @@ export interface EmployeeForm {
     position: string[],
     skill: string[],
     hobby: string[],
-    married: boolean
+    married: string //본사 컴 DB에선 boolean? 
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import './Detail.css'
 import type { Employee } from '../../types/employee';
 import { SKILL_OPTIONS } from '../../constants/codeMap';
@@ -18,8 +18,6 @@ function Detail({
   onChange
 }: EmployeeRowProps) {
   const [isHobbyOpen, setIsHobbyOpen] = useState(false);
-
-  const hobbyRef = useRef<HTMLDivElement>(null);
 
   const skills = employee.skill
     ? employee.skill.split(",")
@@ -78,13 +76,25 @@ function Detail({
                 Name
               </td>
               <td>
-                <input id="name" className="detail-basic-input" name="name" />
+                <input
+                  id="name"
+                  className="detail-basic-input"
+                  name="name"
+                  value={employee.empName || ''}
+                  readOnly
+                />
               </td>
               <td>
                 Emp ID
               </td>
               <td>
-                <input id="empId" className="detail-basic-input" name="empId" />
+                <input
+                  id="empId"
+                  className="detail-basic-input"
+                  name="empId"
+                  value={employee.empId || ''}
+                  readOnly
+                />
               </td>
             </tr>
             <tr>
@@ -104,7 +114,13 @@ function Detail({
                 Hire Date
               </td>
               <td>
-                <input type="date" id="hireDate" name="hireDate" />
+                <input
+                  type="date"
+                  id="hireDate"
+                  name="hireDate"
+                  value={employee.hireDate || ''}
+                  readOnly
+                />
               </td>
             </tr>
             <tr>
@@ -112,20 +128,26 @@ function Detail({
                 Salary
               </td>
               <td>
-                <input id="salary" className="detail-basic-input" name="salary" />
+                <input
+                  id="salary"
+                  className="detail-basic-input"
+                  name="salary"
+                  value={employee.salary ? employee.salary.toLocaleString() : ''}
+                  readOnly
+                />
               </td>
               <td>
                 Gender/Marial Status
               </td>
               <td>
                 <label>
-                  <input type="radio" name="gender" />{' '}Male
+                  <input type="radio" name="gender" checked={employee.gender === 'M'} readOnly />{' '}Male
                 </label>
                 <label>
-                  <input type="radio" name="gender" />{' '}Female
+                  <input type="radio" name="gender" checked={employee.gender === 'F'} readOnly />{' '}Female
                 </label>
                 <label>
-                  <input type="checkbox" id="maritalStatus" name="maritalStatus" />{' '}Marital Status
+                  <input type="checkbox" id="maritalStatus" name="maritalStatus" checked={employee.married === 'Y'} />{' '}Marital Status
                 </label>
               </td>
             </tr>
@@ -134,7 +156,14 @@ function Detail({
                 Position
               </td>
               <td>
-                <select size={4} style={{ width: "200px" }} id="position" name="position">
+                <select
+                  size={4}
+                  style={{ width: "200px" }}
+                  id="position"
+                  name="position"
+                  value={employee.position || ''}
+                  onChange={(e) => onChange(employee.empId, "position", e.target.value)}
+                >
                   <option value="10">CEO</option>
                   <option value="20">Director</option>
                   <option value="30">General Manager</option>
@@ -147,7 +176,11 @@ function Detail({
                 Memo
               </td>
               <td>
-                <textarea id="memo" name="memo"></textarea>
+                <textarea
+                  id="memo"
+                  name="memo"
+                  defaultValue={employee.memo || ''}
+                ></textarea>
               </td>
             </tr>
             <tr>
