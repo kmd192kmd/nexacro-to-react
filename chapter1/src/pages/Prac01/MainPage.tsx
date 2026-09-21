@@ -92,7 +92,7 @@ function MainPage() {
         }
         const updated = { ...employee, [field]: value };
 
-        setSelectedEmployee((currSelected) => 
+        setSelectedEmployee((currSelected) =>
           currSelected?.empId === empId ? updated : currSelected
         );
 
@@ -104,58 +104,60 @@ function MainPage() {
 
   return (
     <>
-      <div className="page-header">
-        <h2>Employees</h2>
+      <div className='dropdown-overlay-container'>
+        <div className="page-header">
+          <h2>Employees</h2>
 
-        <div className="button-container">
-          <button className='btn-retrieve'>Retrieve</button>
-          <button>Add</button>
-          <button>Delete</button>
-          <button>Save</button>
+          <div className="button-container">
+            <button className='btn-retrieve'>Retrieve</button>
+            <button>Add</button>
+            <button>Delete</button>
+            <button>Save</button>
+          </div>
         </div>
-      </div>
 
-      <div className="search-container">
-        <div className="search-item">
-          <div className='department-div'><label htmlFor="department">Department</label></div>
-          <div className='department-container'>
-            <div className='department-input-wrapper'>
-              <input id="department" name="department" className='department-input' />
-              <Search size={18} />
+        <div className="search-container">
+          <div className="search-item">
+            <div className='department-div'><label htmlFor="department">Department</label></div>
+            <div className='department-container'>
+              <div className='department-input-wrapper'>
+                <input id="department" name="department" className='department-input' />
+                <Search size={18} />
+              </div>
+              <input id="department-printout" className='department-printout' disabled />
             </div>
-            <input id="department-printout" className='department-printout' disabled />
+          </div>
+
+          <div className="search-item">
+            <div className='name-div'><label htmlFor="name">Name</label></div>
+            <input id="name" name="name" className='name-input' />
+          </div>
+
+          <div className="search-item gender-item">
+            <div className='gender-div'>Gender</div>
+            <div className='gender-radio-wrapper'>
+              <label>
+                <input type="radio" name="gender" className="gender-radio" value="all" defaultChecked />{' '}All
+              </label>
+            </div>
+
+            <div className='gender-radio-wrapper'>
+              <label>
+                <input type="radio" name="gender" className="gender-radio" value="male" />{' '}Male
+              </label>
+            </div>
+
+            <div className='gender-radio-wrapper'>
+              <label>
+                <input type="radio" name="gender" className="gender-radio" value="female" />{' '}Female
+              </label>
+            </div>
+
           </div>
         </div>
 
-        <div className="search-item">
-          <div className='name-div'><label htmlFor="name">Name</label></div>
-          <input id="name" name="name" className='name-input' />
-        </div>
-
-        <div className="search-item gender-item">
-          <div className='gender-div'>Gender</div>
-          <div className='gender-radio-wrapper'>
-            <label>
-              <input type="radio" name="gender" className="gender-radio" value="all" defaultChecked />{' '}All
-            </label>
-          </div>
-
-          <div className='gender-radio-wrapper'>
-            <label>
-              <input type="radio" name="gender" className="gender-radio" value="male" />{' '}Male
-            </label>
-          </div>
-
-          <div className='gender-radio-wrapper'>
-            <label>
-              <input type="radio" name="gender" className="gender-radio" value="female" />{' '}Female
-            </label>
-          </div>
-
-        </div>
+        <h3>List</h3>
       </div>
-
-      <h3>List</h3>
 
       <div
         className='table-container'
@@ -187,6 +189,7 @@ function MainPage() {
                 onChange={handleChange}
                 isSelected={selectedEmployee?.empId === employee.empId}
                 onSelect={() => setSelectedEmployee(employee)}
+                containerRef={tableContainerRef as React.RefObject<HTMLElement>}
               />
             ))}
 

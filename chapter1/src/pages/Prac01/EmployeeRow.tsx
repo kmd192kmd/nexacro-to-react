@@ -16,6 +16,7 @@ interface EmployeeRowProps {
   index: number;
   isSelected?: boolean;
   onSelect: () => void;
+  containerRef: React.RefObject<HTMLElement>;
 
   onChange: (
     empId: number,
@@ -30,12 +31,16 @@ function EmployeeRow({
   isSelected,
   onSelect,
   onChange,
+  containerRef
 }: EmployeeRowProps) {
 
   // const [isSkillOpen, setIsSkillOpen] = useState(false);
   // const [isHobbyOpen, setIsHobbyOpen] = useState(false);
   const [open, setOpen] = useState<"skill" | "hobby" | null>(null);
-  const [coords, setCoords] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [coords, setCoords] = useState<{
+    top: number; left: number; width: number;
+    containerTop: number; containerLeft: number; containerWidth: number;
+  } | null>(null);
 
   const skillButtonRef = useRef<HTMLButtonElement>(null);
   const hobbyButtonRef = useRef<HTMLButtonElement>(null);
@@ -45,25 +50,76 @@ function EmployeeRow({
 
   const hobbies = employee.hobby ? employee.hobby.split(",") : [];
 
+  const updateCoords = () => {
+    const buttonRef = open === "skill" ? skillButtonRef : hobbyButtonRef;
+
+    if (!buttonRef.current) return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+
+    setCoords({
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+
+      containerTop: containerRect.top,
+      containerLeft: containerRect.left,
+      containerWidth: containerRect.width,
+    });
+  };
+
   const handleToggle = (field: "skill" | "hobby", buttonRef: React.RefObject<HTMLButtonElement | null>) => {
+
     if (open === field) {
       setOpen(null);
       setCoords(null);
-    } else {
-      if (buttonRef.current) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        setCoords({
-          top: rect.bottom + 4,
-          left: rect.left,
-          width: rect.width,
-        });
-      }
-      setOpen(field);
+
+      return;
+    }
+
+    setOpen(field);
+
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      setCoords({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+
+        containerTop: containerRect.top,
+        containerLeft: containerRect.left,
+        containerWidth: containerRect.width,
+      });
     }
   };
 
   useEffect(() => {
     if (open === null) return;
+
+    updateCoords();
+
+    const handleResize = () => {
+      updateCoords();
+    };
+
+    let animationFrameId: number | null = null;
+
+    const handleScroll = () => {
+      if (animationFrameId !== null) return;
+
+      animationFrameId = requestAnimationFrame(() => {
+        updateCoords();
+        animationFrameId = null;
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, true);
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
@@ -151,8 +207,10 @@ function EmployeeRow({
             ref={skillButtonRef}
             type="button"
             className="select-button"
-            onClick={() =>
-              handleToggle("skill", skillButtonRef)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggle("skill", skillButtonRef);
+            }}
           >
             <span>
               {skills.length > 0
@@ -178,8 +236,10 @@ function EmployeeRow({
             ref={hobbyButtonRef}
             type="button"
             className='select-button'
-            onClick={() =>
-              handleToggle("hobby", hobbyButtonRef)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggle("hobby", hobbyButtonRef);
+            }}
           >
             <span>
               {hobbies.length > 0
@@ -195,43 +255,55 @@ function EmployeeRow({
       </td>
 
       {open && coords && createPortal(
-        <div
-          ref={dropdownRef}
-          className="options-fixed"
-          style={{
-            top: `${coords.top}px`,
-            left: `${coords.left}px`,
-            width: `${coords.width}px`,
-          }}
-        >
-          {open === "skill" ? (
-            SKILL_OPTIONS.map((skill) => (
-              <label key={skill.code} className="option">
-                <input
-                  type="checkbox"
-                  checked={skills.includes(skill.code)}
-                  onChange={(e) =>
-                    handleMultiSelectChange("skill", skill.code, e.target.checked)
-                  }
-                />
-                <span>{skill.name}</span>
-              </label>
-            ))
-          ) : (
-            Object.entries(HOBBY_MAP).map(([code, name]) => (
-              <label key={code} className='option'>
-                <input
-                  type="checkbox"
-                  checked={hobbies.includes(code)}
-                  onChange={(e) =>
-                    handleMultiSelectChange("hobby", code, e.target.checked)
-                  }
-                />
-                <span>{name}</span>
-              </label>
-            ))
-          )}
-        </div>,
+        <>
+          <div 
+            className="dropdown-clip-overlay"
+            style={{
+              top: 0,
+              left: `${coords.containerLeft}px`,
+              width: `${coords.containerWidth}px`,
+              height: `${coords.containerTop}px`,
+            }}
+          />
+
+          <div
+            ref={dropdownRef}
+            className="options-fixed"
+            style={{
+              top: `${coords.top}px`,
+              left: `${coords.left}px`,
+              width: `${coords.width}px`,
+            }}
+          >
+            {open === "skill" ? (
+              SKILL_OPTIONS.map((skill) => (
+                <label key={skill.code} className="option">
+                  <input
+                    type="checkbox"
+                    checked={skills.includes(skill.code)}
+                    onChange={(e) =>
+                      handleMultiSelectChange("skill", skill.code, e.target.checked)
+                    }
+                  />
+                  <span>{skill.name}</span>
+                </label>
+              ))
+            ) : (
+              Object.entries(HOBBY_MAP).map(([code, name]) => (
+                <label key={code} className='option'>
+                  <input
+                    type="checkbox"
+                    checked={hobbies.includes(code)}
+                    onChange={(e) =>
+                      handleMultiSelectChange("hobby", code, e.target.checked)
+                    }
+                  />
+                  <span>{name}</span>
+                </label>
+              ))
+            )}
+          </div>
+        </>,
         document.body
       )}
     </tr>

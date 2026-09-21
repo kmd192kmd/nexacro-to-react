@@ -6,6 +6,11 @@ table,
   box-sizing: border-box;
 }
 
+.dropdown-overlay-container {
+  position: relative;
+  z-index: 1002;
+}
+
 .page-header {
   display: flex;
   align-items: center;

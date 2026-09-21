@@ -147,7 +147,12 @@ function Detail({
                   <input type="radio" name="gender" checked={employee.gender === 'F'} readOnly />{' '}Female
                 </label>
                 <label>
-                  <input type="checkbox" id="maritalStatus" name="maritalStatus" checked={employee.married === 'Y'} />{' '}Marital Status
+                  <input 
+                  type="checkbox" 
+                  id="maritalStatus" 
+                  name="maritalStatus" 
+                  checked={employee.married === 'Y'}
+                  />{' '}Marital Status
                 </label>
               </td>
             </tr>

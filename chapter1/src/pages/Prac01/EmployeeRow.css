@@ -114,6 +114,12 @@ th:nth-child(11) { width: 160px; }
   height: 1px;
 }
 
+.dropdown-clip-overlay {
+  position: fixed;
+  background: white;
+  z-index: 1001;
+}
+
 .options-fixed {
   position: fixed;
   display: flex;
@@ -122,9 +128,10 @@ th:nth-child(11) { width: 160px; }
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 99999;
+  z-index: 1000;
   max-height: 220px;
   overflow-y: auto;
   box-sizing: border-box;
   font-size: 14px;
 }
+
