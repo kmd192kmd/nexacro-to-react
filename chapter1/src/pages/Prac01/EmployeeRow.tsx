@@ -16,7 +16,7 @@ interface EmployeeRowProps {
   index: number;
   isSelected?: boolean;
   onSelect: () => void;
-  containerRef: React.RefObject<HTMLElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 
   onChange: (
     empId: number,
@@ -39,7 +39,8 @@ function EmployeeRow({
   const [open, setOpen] = useState<"skill" | "hobby" | null>(null);
   const [coords, setCoords] = useState<{
     top: number; left: number; width: number;
-    containerTop: number; containerLeft: number; containerWidth: number;
+    containerTop: number; containerBottom: number; containerLeft: number; containerWidth: number;
+    buttonAbove: boolean; buttonBelow: boolean;
   } | null>(null);
 
   const skillButtonRef = useRef<HTMLButtonElement>(null);
@@ -57,7 +58,12 @@ function EmployeeRow({
 
     const rect = buttonRef.current.getBoundingClientRect();
 
+    if (!containerRef.current) return;
+
     const containerRect = containerRef.current.getBoundingClientRect();
+
+    const buttonAbove = rect.bottom <= containerRect.top;
+    const buttonBelow = rect.top >= containerRect.bottom;
 
     setCoords({
       top: rect.bottom + 4,
@@ -65,8 +71,12 @@ function EmployeeRow({
       width: rect.width,
 
       containerTop: containerRect.top,
+      containerBottom: containerRect.bottom,
       containerLeft: containerRect.left,
       containerWidth: containerRect.width,
+
+      buttonAbove,
+      buttonBelow,
     });
   };
 
@@ -84,7 +94,12 @@ function EmployeeRow({
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
 
+      if (!containerRef.current) return;
+
       const containerRect = containerRef.current.getBoundingClientRect();
+
+      const buttonAbove = rect.bottom <= containerRect.top;
+      const buttonBelow = rect.top >= containerRect.bottom;
 
       setCoords({
         top: rect.bottom + 4,
@@ -92,8 +107,12 @@ function EmployeeRow({
         width: rect.width,
 
         containerTop: containerRect.top,
+        containerBottom: containerRect.bottom,
         containerLeft: containerRect.left,
         containerWidth: containerRect.width,
+
+        buttonAbove,
+        buttonBelow,
       });
     }
   };
@@ -207,8 +226,8 @@ function EmployeeRow({
             ref={skillButtonRef}
             type="button"
             className="select-button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
+              //e.stopPropagation();
               handleToggle("skill", skillButtonRef);
             }}
           >
@@ -236,8 +255,8 @@ function EmployeeRow({
             ref={hobbyButtonRef}
             type="button"
             className='select-button'
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
+              //e.stopPropagation();
               handleToggle("hobby", hobbyButtonRef);
             }}
           >
@@ -256,15 +275,29 @@ function EmployeeRow({
 
       {open && coords && createPortal(
         <>
-          <div 
-            className="dropdown-clip-overlay"
-            style={{
-              top: 0,
-              left: `${coords.containerLeft}px`,
-              width: `${coords.containerWidth}px`,
-              height: `${coords.containerTop}px`,
-            }}
-          />
+          {coords.buttonAbove && (
+            <div
+              className="dropdown-clip-overlay"
+              style={{
+                top: 0,
+                left: `${coords.containerLeft}px`,
+                width: `${coords.containerWidth}px`,
+                height: `${Math.max(0, coords.containerTop)}px`,
+              }}
+            />
+          )}
+
+          {coords.buttonBelow && (
+            <div
+              className='dropdown-clip-overlay'
+              style={{
+                top: `${coords.containerBottom}px`,
+                left: `${coords.containerLeft}px`,
+                width: `${coords.containerWidth}px`,
+                bottom: 0,
+              }}
+            />
+          )}
 
           <div
             ref={dropdownRef}
@@ -273,6 +306,7 @@ function EmployeeRow({
               top: `${coords.top}px`,
               left: `${coords.left}px`,
               width: `${coords.width}px`,
+              zIndex: coords.buttonAbove || coords.buttonBelow ? 1000 : 1003,
             }}
           >
             {open === "skill" ? (

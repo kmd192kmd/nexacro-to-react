@@ -1,3 +1,15 @@
 .detail-container {
 
 }
+
+.detail-td-basic {
+    text-align: left;
+}
+
+.detail-td-title {
+    width: 100px;
+}
+
+.detail-td-content {
+    width: 200px;
+}

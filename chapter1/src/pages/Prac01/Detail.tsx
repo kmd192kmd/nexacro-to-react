@@ -72,25 +72,25 @@ function Detail({
         <table>
           <tbody>
             <tr>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Name
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <input
                   id="name"
-                  className="detail-basic-input"
+                  className="detail-input-basic"
                   name="name"
                   value={employee.empName || ''}
                   readOnly
                 />
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Emp ID
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <input
                   id="empId"
-                  className="detail-basic-input"
+                  className="detail-input-basic"
                   name="empId"
                   value={employee.empId || ''}
                   readOnly
@@ -98,10 +98,10 @@ function Detail({
               </td>
             </tr>
             <tr>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Department
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-selectbox detail-td-content">
                 <select id="department" name="department">
                   <option value="10">Accounting Team</option>
                   <option value="20">Finances Team</option>
@@ -110,36 +110,37 @@ function Detail({
                   <option value="50">Sales Team</option>
                 </select>
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Hire Date
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <input
                   type="date"
                   id="hireDate"
                   name="hireDate"
                   value={employee.hireDate || ''}
                   readOnly
+                  className="detail-input-basic"
                 />
               </td>
             </tr>
             <tr>
-              <td>
+              <td className="detail-td-basic detail-td-title detail-td-salary">
                 Salary
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <input
                   id="salary"
-                  className="detail-basic-input"
+                  className="detail-input-basic"
                   name="salary"
                   value={employee.salary ? employee.salary.toLocaleString() : ''}
                   readOnly
                 />
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Gender/Marial Status
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <label>
                   <input type="radio" name="gender" checked={employee.gender === 'M'} readOnly />{' '}Male
                 </label>
@@ -157,10 +158,10 @@ function Detail({
               </td>
             </tr>
             <tr>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Position
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <select
                   size={4}
                   style={{ width: "200px" }}
@@ -177,10 +178,10 @@ function Detail({
                   <option value="60">Staff</option>
                 </select>
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Memo
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <textarea
                   id="memo"
                   name="memo"
@@ -189,10 +190,10 @@ function Detail({
               </td>
             </tr>
             <tr>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Hobby
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
                 <div className='hobby-dropdown'>
                   <button
                     type="button"
@@ -234,10 +235,10 @@ function Detail({
                   )}
                 </div>
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-title">
                 Skill
               </td>
-              <td>
+              <td className="detail-td-basic detail-td-content">
               </td>
             </tr>
           </tbody>

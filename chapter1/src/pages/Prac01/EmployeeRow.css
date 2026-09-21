@@ -118,6 +118,7 @@ th:nth-child(11) { width: 160px; }
   position: fixed;
   background: white;
   z-index: 1001;
+  pointer-events: none;
 }
 
 .options-fixed {

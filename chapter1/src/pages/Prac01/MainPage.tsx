@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { createElement, useCallback, useEffect, useRef, useState } from 'react';
 import './MainPage.css'
 import { getEmployees } from "../../api/empApi";
 import type { Employee } from '../../types/employee';
@@ -57,6 +57,12 @@ function MainPage() {
   useEffect(() => {
     loadEmployees();
   }, []);
+
+  useEffect(() => {
+    if (emp.length > 0 && selectedEmployee === null) {
+      setSelectedEmployee(emp[0]);
+    }
+  }, [emp, selectedEmployee]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -137,19 +143,19 @@ function MainPage() {
             <div className='gender-div'>Gender</div>
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="gender" className="gender-radio" value="all" defaultChecked />{' '}All
+                <input type="radio" name="searchGender" className="gender-radio" value="all" defaultChecked />{' '}All
               </label>
             </div>
 
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="gender" className="gender-radio" value="male" />{' '}Male
+                <input type="radio" name="searchGender" className="gender-radio" value="male" />{' '}Male
               </label>
             </div>
 
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="gender" className="gender-radio" value="female" />{' '}Female
+                <input type="radio" name="searchGender" className="gender-radio" value="female" />{' '}Female
               </label>
             </div>
 
@@ -189,7 +195,7 @@ function MainPage() {
                 onChange={handleChange}
                 isSelected={selectedEmployee?.empId === employee.empId}
                 onSelect={() => setSelectedEmployee(employee)}
-                containerRef={tableContainerRef as React.RefObject<HTMLElement>}
+                containerRef={tableContainerRef}
               />
             ))}
 
@@ -209,13 +215,15 @@ function MainPage() {
         </table>
       </div>
 
-      <h3>Detail</h3>
-      {selectedEmployee && (
-        <Detail
-          employee={selectedEmployee}
-          onChange={handleChange}
-        />
-      )}
+      <div className='dropdown-overlay-container'>
+        {createElement('h3', null, 'Detail')}
+        {selectedEmployee && (
+          <Detail
+            employee={selectedEmployee}
+            onChange={handleChange}
+          />
+        )}
+      </div>
     </>
   )
 }
