@@ -88,7 +88,7 @@ function MainPage() {
 
   const handleChange = useCallback((
     empId: number,
-    field: "skill" | "hobby" | "position",
+    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => {
     setEmp((prev) =>
@@ -192,7 +192,7 @@ function MainPage() {
                 key={employee.empId}
                 employee={employee}
                 index={index}
-                onChange={handleChange}
+                handleChange={handleChange}
                 isSelected={selectedEmployee?.empId === employee.empId}
                 onSelect={() => setSelectedEmployee(employee)}
                 containerRef={tableContainerRef}
@@ -220,7 +220,7 @@ function MainPage() {
         {selectedEmployee && (
           <Detail
             employee={selectedEmployee}
-            onChange={handleChange}
+            handleChange={handleChange}
           />
         )}
       </div>

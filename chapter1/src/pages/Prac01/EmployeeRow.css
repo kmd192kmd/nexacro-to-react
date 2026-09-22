@@ -73,7 +73,7 @@ th:nth-child(11) { width: 160px; }
   margin-left: 6px;
 }
 
-.options {
+/* .options {
   position: absolute;
   top: calc(100% + 2px);
   left: 0;
@@ -91,7 +91,7 @@ th:nth-child(11) { width: 160px; }
 
   max-height: 200px;
   overflow-y: auto;
-}
+} */
 
 .option {
   width: 100%;
@@ -135,4 +135,11 @@ th:nth-child(11) { width: 160px; }
   box-sizing: border-box;
   font-size: 14px;
 }
+ 
+.employeeRow-select-position {
+  width: 100%;
+  height: 32px;
+  padding: 0 4px;
 
+  background: white;
+}

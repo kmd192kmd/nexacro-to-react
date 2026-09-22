@@ -5,7 +5,7 @@ import {
   DEPARTMENT_MAP,
   GENDER_MAP,
   HOBBY_MAP,
-  POSITION_MAP,
+  POSITION_OPTIONS,
   SKILL_MAP,
   SKILL_OPTIONS,
 } from '../../constants/codeMap';
@@ -18,9 +18,9 @@ interface EmployeeRowProps {
   onSelect: () => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
 
-  onChange: (
+  handleChange: (
     empId: number,
-    field: "skill" | "hobby" | "position",
+    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
 }
@@ -30,7 +30,7 @@ function EmployeeRow({
   index,
   isSelected,
   onSelect,
-  onChange,
+  handleChange,
   containerRef
 }: EmployeeRowProps) {
 
@@ -179,7 +179,7 @@ function EmployeeRow({
         (value) => value !== code
       );
 
-    onChange(
+    handleChange(
       employee.empId,
       field,
       newValues.join(",")
@@ -200,7 +200,16 @@ function EmployeeRow({
       </td>
 
       <td>
-        {POSITION_MAP[employee.position]}
+        <select
+          value={employee.position || ""}
+          className='employeeRow-select-basic employeeRow-select-position'
+        >
+          {POSITION_OPTIONS.map((position) => (
+            <option key={position.code} value={position.code}>
+              {position.name}
+            </option>
+          ))}
+        </select>
       </td>
 
       <td>{employee.hireDate}</td>
@@ -231,7 +240,16 @@ function EmployeeRow({
               handleToggle("skill", skillButtonRef);
             }}
           >
-            <span>
+            <span
+              onMouseEnter={(e) => {
+                const spanEl = e.currentTarget;
+                if (spanEl.scrollWidth > spanEl.clientWidth) {
+                  spanEl.title = skills.map((code) => SKILL_MAP[code]).join(", ");
+                } else {
+                  spanEl.title = "";
+                }
+              }}
+            >
               {skills.length > 0
                 ? skills
                   .map((code) => SKILL_MAP[code])

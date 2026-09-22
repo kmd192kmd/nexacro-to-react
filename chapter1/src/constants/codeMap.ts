@@ -26,7 +26,14 @@ export const SKILL_MAP: Record<string, string> = {
     "03": "JavaSript",
     "04": "JAVA",
     "05": "C/C++",
-    "06": "Python"
+    "06": "Python",
+    "07": "PHP",
+    "08": "React",
+    "09": "Vue",
+    "10": "Ruby",
+    "11": "Swift",
+    "12": "Kotlin",
+    "13": "SQL"
 }
 
 export const HOBBY_MAP: Record<string, string> = {
@@ -48,5 +55,9 @@ export const HOBBY_MAP: Record<string, string> = {
 }
 
 export const SKILL_OPTIONS = Object.entries(SKILL_MAP).map(
+    ([code, name]) => ({ code, name })
+);
+
+export const POSITION_OPTIONS = Object.entries(POSITION_MAP).map(
     ([code, name]) => ({ code, name })
 );

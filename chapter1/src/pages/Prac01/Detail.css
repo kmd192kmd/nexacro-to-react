@@ -1,15 +1,166 @@
 .detail-container {
-
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .detail-td-basic {
     text-align: left;
+    height: 25px;
 }
 
 .detail-td-title {
-    width: 100px;
+    width: 15%;
+    min-width: 100px;
 }
 
 .detail-td-content {
-    width: 200px;
+    width: 35%;
+    min-width: 100px;
+}
+
+.detail-td-position,
+.detail-td-memo {
+    min-height: 60px
+}
+
+.detail-td-skill,
+.detail-td-hobby {
+    min-height: 60px;
+}
+
+.detail-input-basic {
+    width: 60%;
+    height: 75%;
+    min-width: 100px;
+    box-sizing: border-box;
+}
+
+.detail-input-salary {
+    text-align: right;
+    padding-right: 8px;
+}
+
+.detail-input-empId {
+    cursor: not-allowed;
+}
+
+.detail-select-basic {
+    width: 60%;
+    height: 75%;
+    min-width: 100px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.detail-textarea-basic {
+    width: 75%;
+    height: 75%;
+    min-height: 60px;
+    min-width: 100px;
+    box-sizing: border-box;
+    resize: none;
+}
+
+.detail-dropdown-hobby-button {
+    width: 100%;
+    height: 75%;
+    min-height: 40px;
+    min-width: 120px;
+    box-sizing: border-box;
+    text-align: left;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+.detail-dropdown-hobby-button > span:first-child {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.detail-dropdown-hobby-button > span:last-child {
+    flex-shrink: 0;
+    margin-left: 6px;
+}
+
+.detail-dropdown-hobby-div {
+    position: relative;
+    width: 90%;
+    height: 100%;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+}
+
+.hobby-dropdown-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    bottom: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    z-index: 1003;
+    min-height: 100px;
+    height: 400px;
+    overflow-y: auto;
+    margin-bottom: 4px;
+}
+
+.detail-hobby-option {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 7px 8px;
+
+    cursor: pointer;
+}
+
+.detail-hobby-option:hover {
+    background: #f5f5f5;
+}
+
+.detail-skill-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    width: 90%;
+    box-sizing: border-box;
+}
+
+.detail-skill-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.detail-td-gender-marital {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.detail-gender-group {
+    display: flex;
+    gap: 15px;
+}
+
+.detail-label-marital {
+    margin-left: 40px;
 }

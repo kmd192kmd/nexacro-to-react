@@ -1,21 +1,21 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import './Detail.css'
 import type { Employee } from '../../types/employee';
-import { SKILL_OPTIONS } from '../../constants/codeMap';
+import { HOBBY_MAP, POSITION_MAP, POSITION_OPTIONS, SKILL_OPTIONS } from '../../constants/codeMap';
 
 interface EmployeeRowProps {
   employee: Employee;
 
-  onChange: (
+  handleChange: (
     empId: number,
-    field: "skill" | "hobby" | "position",
+    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
 }
 
 function Detail({
   employee,
-  onChange
+  handleChange
 }: EmployeeRowProps) {
   const [isHobbyOpen, setIsHobbyOpen] = useState(false);
 
@@ -43,7 +43,7 @@ function Detail({
   //   });
 
   const handleMultiSelectChange = (
-    field: "skill" | "hobby",
+    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     code: string,
     checked: boolean
   ) => {
@@ -58,7 +58,7 @@ function Detail({
         (value) => value !== code
       );
 
-    onChange(
+    handleChange(
       employee.empId,
       field,
       newValues.join(",")
@@ -81,7 +81,7 @@ function Detail({
                   className="detail-input-basic"
                   name="name"
                   value={employee.empName || ''}
-                  readOnly
+                  onChange={(e) => handleChange(employee.empId, "name", e.target.value)}
                 />
               </td>
               <td className="detail-td-basic detail-td-title">
@@ -90,10 +90,10 @@ function Detail({
               <td className="detail-td-basic detail-td-content">
                 <input
                   id="empId"
-                  className="detail-input-basic"
+                  className="detail-input-basic detail-input-empId"
                   name="empId"
                   value={employee.empId || ''}
-                  readOnly
+                  disabled
                 />
               </td>
             </tr>
@@ -102,7 +102,12 @@ function Detail({
                 Department
               </td>
               <td className="detail-td-basic detail-td-selectbox detail-td-content">
-                <select id="department" name="department">
+                <select
+                  id="department"
+                  name="department"
+                  className='detail-select-basic detail-select-department'
+                  onChange={(e) => handleChange(employee.empId, "deptCode", e.target.value)}
+                >
                   <option value="10">Accounting Team</option>
                   <option value="20">Finances Team</option>
                   <option value="30">Human Resource Team</option>
@@ -119,8 +124,8 @@ function Detail({
                   id="hireDate"
                   name="hireDate"
                   value={employee.hireDate || ''}
-                  readOnly
                   className="detail-input-basic"
+                  onChange={(e) => handleChange(employee.empId, "hireDate", e.target.value)}
                 />
               </td>
             </tr>
@@ -131,78 +136,105 @@ function Detail({
               <td className="detail-td-basic detail-td-content">
                 <input
                   id="salary"
-                  className="detail-input-basic"
+                  className="detail-input-basic detail-input-salary"
                   name="salary"
                   value={employee.salary ? employee.salary.toLocaleString() : ''}
-                  readOnly
+                  onChange={(e) => handleChange(employee.empId, "salary", e.target.value)}
                 />
               </td>
               <td className="detail-td-basic detail-td-title">
                 Gender/Marial Status
               </td>
-              <td className="detail-td-basic detail-td-content">
-                <label>
-                  <input type="radio" name="gender" checked={employee.gender === 'M'} readOnly />{' '}Male
-                </label>
-                <label>
-                  <input type="radio" name="gender" checked={employee.gender === 'F'} readOnly />{' '}Female
-                </label>
-                <label>
-                  <input 
-                  type="checkbox" 
-                  id="maritalStatus" 
-                  name="maritalStatus" 
-                  checked={employee.married === 'Y'}
-                  />{' '}Marital Status
+              <td className="detail-td-basic detail-td-content detail-td-gender-marital">
+                <div className='detail-gender-group'>
+                  <label>
+                    <input
+                      type="radio"
+                      name="gender"
+                      checked={employee.gender === 'M'}
+                      value="M"
+                      onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                    />
+                    {' '}Male
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="gender"
+                      checked={employee.gender === 'F'}
+                      value="F"
+                      onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                    />
+                    {' '}Female
+                  </label>
+                </div>
+                <label className='detail-label-marital'>
+                  <input
+                    type="checkbox"
+                    id="maritalStatus"
+                    name="maritalStatus"
+                    checked={employee.married === 'Y'}
+                    onChange={(e) => handleChange(employee.empId, "married", e.target.checked ? 'Y' : 'N')}
+                  />
+                  {' '}Marital Status
                 </label>
               </td>
             </tr>
             <tr>
-              <td className="detail-td-basic detail-td-title">
+              <td className="detail-td-basic detail-td-title detail-td-position">
                 Position
               </td>
-              <td className="detail-td-basic detail-td-content">
+              <td className="detail-td-basic detail-td-content detail-td-position">
                 <select
                   size={4}
-                  style={{ width: "200px" }}
                   id="position"
                   name="position"
+                  className='detail-select-basic detail-select-position'
                   value={employee.position || ''}
-                  onChange={(e) => onChange(employee.empId, "position", e.target.value)}
+                  onChange={(e) => handleChange(employee.empId, "position", e.target.value)}
                 >
-                  <option value="10">CEO</option>
+                  {/* <option value="10">CEO</option>
                   <option value="20">Director</option>
                   <option value="30">General Manager</option>
                   <option value="40">Manager</option>
                   <option value="50">Assistant Manager</option>
-                  <option value="60">Staff</option>
+                  <option value="60">Staff</option> */}
+                  {POSITION_OPTIONS.map((position) => (
+                    <option key={position.code} value={position.code}>
+                      {position.name}
+                    </option>
+                  ))}
                 </select>
               </td>
-              <td className="detail-td-basic detail-td-title">
+              <td className="detail-td-basic detail-td-title detail-td-memo">
                 Memo
               </td>
-              <td className="detail-td-basic detail-td-content">
+              <td className="detail-td-basic detail-td-content detail-td-memo">
                 <textarea
                   id="memo"
                   name="memo"
-                  defaultValue={employee.memo || ''}
+                  className='detail-textarea-basic'
+                  value={employee.memo || ''}
+                  onChange={(e) => handleChange(employee.empId, "memo", e.target.value)}
                 ></textarea>
               </td>
             </tr>
             <tr>
-              <td className="detail-td-basic detail-td-title">
+              <td className="detail-td-basic detail-td-title detail-td-hobby">
                 Hobby
               </td>
-              <td className="detail-td-basic detail-td-content">
-                <div className='hobby-dropdown'>
+              <td className="detail-td-basic detail-td-content detail-td-hobby">
+                <div className='detail-dropdown-hobby-div'>
                   <button
                     type="button"
-                    className="hobby-dropdown-button"
+                    className="detail-dropdown-hobby-button"
                     onClick={() => setIsHobbyOpen((prev) => !prev)}
                   >
                     <span>
                       {hobbies.length > 0
-                        ? hobbies.join(',')
+                        ? hobbies
+                          .map((code) => HOBBY_MAP[code])
+                          .join(", ")
                         : 'Select Hobby'}
                     </span>
                     <span>▼</span>
@@ -210,35 +242,52 @@ function Detail({
 
                   {isHobbyOpen && (
                     <div className='hobby-dropdown-menu'>
-                      {SKILL_OPTIONS.map((hobby) => (
-                        <label
-                          key={hobby.code}
-                          className='option'
-                        >
+                      {Object.entries(HOBBY_MAP).map(([code, name]) => (
+                        <label key={code} className='detail-hobby-option'>
                           <input
                             type="checkbox"
-                            checked={hobbies.includes(hobby.code)}
+                            checked={hobbies.includes(code)}
                             onChange={(e) =>
-                              handleMultiSelectChange(
-                                "hobby",
-                                hobby.code,
-                                e.target.checked
-                              )
+                              handleMultiSelectChange("hobby", code, e.target.checked)
                             }
                           />
-                          <span>
-                            {hobby.name}
-                          </span>
+                          <span>{name}</span>
                         </label>
                       ))}
                     </div>
                   )}
                 </div>
               </td>
-              <td className="detail-td-basic detail-td-title">
+              <td className="detail-td-basic detail-td-title detail-td-skill">
                 Skill
               </td>
-              <td className="detail-td-basic detail-td-content">
+              <td className="detail-td-basic detail-td-content detail-td-skill">
+                <div className='detail-skill-container'>
+                  {SKILL_OPTIONS.map((skill) => (
+                    <label
+                      key={skill.code}
+                      className='detail-skill-option'
+                      title={skill.name}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget;
+                        if (el.scrollWidth > el.clientWidth) {
+                          el.title = skill.name;
+                        } else {
+                          el.title = "";
+                        }
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={skills.includes(skill.code)}
+                        onChange={(e) =>
+                          handleMultiSelectChange("skill", skill.code, e.target.checked)
+                        }
+                      />
+                      <span>{skill.name}</span>
+                    </label>
+                  ))}
+                </div>
               </td>
             </tr>
           </tbody>
