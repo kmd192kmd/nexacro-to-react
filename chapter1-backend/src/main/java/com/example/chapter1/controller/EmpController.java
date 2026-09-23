@@ -41,9 +41,6 @@ public class EmpController {
             @PathVariable String empId,
             @RequestBody Emp emp
     ) {
-
-        emp.setEmpId(empId);
-
         empService.update(emp);
     }
 

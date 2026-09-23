@@ -15,12 +15,12 @@ interface EmployeeRowProps {
   employee: Employee;
   index: number;
   isSelected?: boolean;
-  onSelect: () => void;
+  onSelect: (employee: Employee) => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
 
   handleChange: (
     empId: number,
-    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
+    field: "empName" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
 }
@@ -187,22 +187,60 @@ function EmployeeRow({
   };
 
   return (
-    <tr onClick={onSelect} style={{ backgroundColor: isSelected ? '#e6f0fa' : 'transparent', cursor: 'pointer' }}>
-
-      <td>{index + 1}</td>
-
-      <td>{employee.empName}</td>
-
-      <td>{employee.empId}</td>
+    <tr onClick={() => onSelect(employee)} style={{ backgroundColor: isSelected ? '#e6f0fa' : 'transparent', cursor: 'pointer' }}>
 
       <td>
+        {index + 1}
+      </td>
+
+      <td
+        className='ellipsis-cell'
+        onMouseEnter={(e) => {
+          const spanEl = e.currentTarget;
+          if (spanEl.scrollWidth > spanEl.clientWidth) {
+            spanEl.title = `${employee.empName}`;
+          } else {
+            spanEl.title = "";
+          }
+        }}
+      >
+        {employee.empName}
+      </td>
+
+      <td
+        className='ellipsis-cell'
+        onMouseEnter={(e) => {
+          const spanEl = e.currentTarget;
+          if (spanEl.scrollWidth > spanEl.clientWidth) {
+            spanEl.title = `${employee.empId}`;
+          } else {
+            spanEl.title = "";
+          }
+        }}>
+        {employee.empId}
+      </td>
+
+      <td
+        className='ellipsis-cell'
+        onMouseEnter={(e) => {
+          const spanEl = e.currentTarget;
+          if (spanEl.scrollWidth > spanEl.clientWidth) {
+            spanEl.title = `${DEPARTMENT_MAP[employee.deptCode]}`;
+          } else {
+            spanEl.title = "";
+          }
+        }}
+      >
         {DEPARTMENT_MAP[employee.deptCode]}
       </td>
 
-      <td>
+      <td className='ellipsis-cell'>
         <select
           value={employee.position || ""}
           className='employeeRow-select-basic employeeRow-select-position'
+          onChange={(e) =>
+            handleChange(employee.empId, "position", e.target.value)
+          }
         >
           {POSITION_OPTIONS.map((position) => (
             <option key={position.code} value={position.code}>
@@ -212,17 +250,17 @@ function EmployeeRow({
         </select>
       </td>
 
-      <td>{employee.hireDate}</td>
+      <td className='ellipsis-cell'>{employee.hireDate}</td>
 
-      <td>
+      <td className='ellipsis-cell'>
         {employee.salary.toLocaleString()}
       </td>
 
-      <td>
+      <td className='ellipsis-cell'>
         {GENDER_MAP[employee.gender]}
       </td>
 
-      <td>
+      <td className='ellipsis-cell'>
         {employee.married}
       </td>
 

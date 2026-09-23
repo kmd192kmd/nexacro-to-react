@@ -99,4 +99,4 @@ COMMIT;
 
 select count(*) from ds_emp;
 
-select * from ds_emp;
+select * from ds_emp order by emp_Id;

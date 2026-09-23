@@ -20,6 +20,11 @@ td {
   text-overflow: ellipsis; */
 }
 
+td.ellipsis-cell {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 th {
   font-weight: 600;
   color: #333;

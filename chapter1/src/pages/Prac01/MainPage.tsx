@@ -1,6 +1,6 @@
 import { createElement, useCallback, useEffect, useRef, useState } from 'react';
 import './MainPage.css'
-import { getEmployees } from "../../api/empApi";
+import { deleteEmployee, getEmployees, updateEmployee } from "../../api/empApi";
 import type { Employee } from '../../types/employee';
 import { Search } from 'lucide-react';
 import EmployeeRow from './EmployeeRow';
@@ -11,6 +11,8 @@ function MainPage() {
   const [loading, setLoading] = useState(false);
 
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+
+  const originalEmployeeRef = useRef<Employee | null>(null);
 
   const pageRef = useRef(0);
   const loadingRef = useRef(false);
@@ -65,6 +67,12 @@ function MainPage() {
   }, [emp, selectedEmployee]);
 
   useEffect(() => {
+    if(selectedEmployee) {
+      originalEmployeeRef.current = JSON.parse(JSON.stringify(selectedEmployee));
+    }
+  }, [selectedEmployee?.empId]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -88,7 +96,7 @@ function MainPage() {
 
   const handleChange = useCallback((
     empId: number,
-    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
+    field: "empName" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => {
     setEmp((prev) =>
@@ -108,6 +116,49 @@ function MainPage() {
   }, []
   );
 
+  const handleSelect = useCallback((employee: Employee) => {
+    setSelectedEmployee(employee);
+  }, []);
+
+  const handleSave = async () => {
+    if(!selectedEmployee) return;
+
+    const isUnchanged = JSON.stringify(selectedEmployee) === JSON.stringify(originalEmployeeRef.current);
+
+    if(isUnchanged) {
+      alert("변경된 내용이 없습니다.");
+      return;
+    }
+
+    try {
+      await updateEmployee(selectedEmployee);
+      originalEmployeeRef.current = JSON.parse(JSON.stringify(selectedEmployee));
+      alert("Save 성공");
+    } catch (error) {
+      console.error("Save 실패:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      if(!selectedEmployee) return;
+
+      const targetEmpId = selectedEmployee.empId;
+
+      await deleteEmployee(selectedEmployee.empId);
+
+      setEmp((prev) => prev.filter((item) => item.empId !== targetEmpId));
+
+      setSelectedEmployee(null);
+      originalEmployeeRef.current = null;
+
+      alert("Delete 성공");
+
+    } catch (error) {
+      console.log("Delete 실패:", error);
+    }
+  };
+
   return (
     <>
       <div className='dropdown-overlay-container'>
@@ -117,8 +168,8 @@ function MainPage() {
           <div className="button-container">
             <button className='btn-retrieve'>Retrieve</button>
             <button>Add</button>
-            <button>Delete</button>
-            <button>Save</button>
+            <button onClick={handleDelete}>Delete</button>
+            <button onClick={handleSave}>Save</button>
           </div>
         </div>
 
@@ -194,7 +245,7 @@ function MainPage() {
                 index={index}
                 handleChange={handleChange}
                 isSelected={selectedEmployee?.empId === employee.empId}
-                onSelect={() => setSelectedEmployee(employee)}
+                onSelect={handleSelect}
                 containerRef={tableContainerRef}
               />
             ))}

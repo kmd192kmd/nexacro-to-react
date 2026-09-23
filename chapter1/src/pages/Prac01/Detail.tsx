@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import './Detail.css'
 import type { Employee } from '../../types/employee';
-import { HOBBY_MAP, POSITION_MAP, POSITION_OPTIONS, SKILL_OPTIONS } from '../../constants/codeMap';
+import { HOBBY_MAP, POSITION_OPTIONS, SKILL_OPTIONS } from '../../constants/codeMap';
 
 interface EmployeeRowProps {
   employee: Employee;
 
   handleChange: (
     empId: number,
-    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
+    field: "empName" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
 }
@@ -43,7 +43,7 @@ function Detail({
   //   });
 
   const handleMultiSelectChange = (
-    field: "name" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
+    field: "skill" | "hobby",
     code: string,
     checked: boolean
   ) => {
@@ -81,7 +81,7 @@ function Detail({
                   className="detail-input-basic"
                   name="name"
                   value={employee.empName || ''}
-                  onChange={(e) => handleChange(employee.empId, "name", e.target.value)}
+                  onChange={(e) => handleChange(employee.empId, "empName", e.target.value)}
                 />
               </td>
               <td className="detail-td-basic detail-td-title">
@@ -106,6 +106,7 @@ function Detail({
                   id="department"
                   name="department"
                   className='detail-select-basic detail-select-department'
+                  value={employee.deptCode || ''}
                   onChange={(e) => handleChange(employee.empId, "deptCode", e.target.value)}
                 >
                   <option value="10">Accounting Team</option>
@@ -146,38 +147,40 @@ function Detail({
                 Gender/Marial Status
               </td>
               <td className="detail-td-basic detail-td-content detail-td-gender-marital">
-                <div className='detail-gender-group'>
-                  <label>
+                <div className='detail-gender-marital-div'>
+                  <div className='detail-gender-group'>
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        checked={employee.gender === 'M'}
+                        value="M"
+                        onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                      />
+                      {' '}Male
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        checked={employee.gender === 'F'}
+                        value="F"
+                        onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                      />
+                      {' '}Female
+                    </label>
+                  </div>
+                  <label className='detail-label-marital'>
                     <input
-                      type="radio"
-                      name="gender"
-                      checked={employee.gender === 'M'}
-                      value="M"
-                      onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                      type="checkbox"
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      checked={employee.married === 'Y'}
+                      onChange={(e) => handleChange(employee.empId, "married", e.target.checked ? 'Y' : 'N')}
                     />
-                    {' '}Male
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="gender"
-                      checked={employee.gender === 'F'}
-                      value="F"
-                      onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
-                    />
-                    {' '}Female
+                    {' '}Marital Status
                   </label>
                 </div>
-                <label className='detail-label-marital'>
-                  <input
-                    type="checkbox"
-                    id="maritalStatus"
-                    name="maritalStatus"
-                    checked={employee.married === 'Y'}
-                    onChange={(e) => handleChange(employee.empId, "married", e.target.checked ? 'Y' : 'N')}
-                  />
-                  {' '}Marital Status
-                </label>
               </td>
             </tr>
             <tr>
