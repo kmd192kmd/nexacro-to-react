@@ -19,10 +19,12 @@ interface EmployeeRowProps {
   containerRef: React.RefObject<HTMLDivElement | null>;
 
   handleChange: (
-    empId: number,
+    rowId: string,
     field: "empName" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 function EmployeeRow({
@@ -31,7 +33,9 @@ function EmployeeRow({
   isSelected,
   onSelect,
   handleChange,
-  containerRef
+  containerRef,
+  className = '',
+  style = {}
 }: EmployeeRowProps) {
 
   // const [isSkillOpen, setIsSkillOpen] = useState(false);
@@ -180,7 +184,7 @@ function EmployeeRow({
       );
 
     handleChange(
-      employee.empId,
+      employee._rowId!,
       field,
       newValues.join(",")
     );
@@ -239,7 +243,7 @@ function EmployeeRow({
           value={employee.position || ""}
           className='employeeRow-select-basic employeeRow-select-position'
           onChange={(e) =>
-            handleChange(employee.empId, "position", e.target.value)
+            handleChange(employee._rowId!, "position", e.target.value)
           }
         >
           {POSITION_OPTIONS.map((position) => (

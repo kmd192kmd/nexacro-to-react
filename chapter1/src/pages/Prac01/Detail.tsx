@@ -7,7 +7,7 @@ interface EmployeeRowProps {
   employee: Employee;
 
   handleChange: (
-    empId: number,
+    rowId: string,
     field: "empName" | "deptCode" | "position" | "hireDate" | "salary" | "gender" | "married" | "skill" | "hobby" | "memo",
     value: string
   ) => void;
@@ -59,7 +59,7 @@ function Detail({
       );
 
     handleChange(
-      employee.empId,
+      employee._rowId!,
       field,
       newValues.join(",")
     );
@@ -81,7 +81,7 @@ function Detail({
                   className="detail-input-basic"
                   name="name"
                   value={employee.empName || ''}
-                  onChange={(e) => handleChange(employee.empId, "empName", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "empName", e.target.value)}
                 />
               </td>
               <td className="detail-td-basic detail-td-title">
@@ -107,7 +107,7 @@ function Detail({
                   name="department"
                   className='detail-select-basic detail-select-department'
                   value={employee.deptCode || ''}
-                  onChange={(e) => handleChange(employee.empId, "deptCode", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "deptCode", e.target.value)}
                 >
                   <option value="10">Accounting Team</option>
                   <option value="20">Finances Team</option>
@@ -126,7 +126,7 @@ function Detail({
                   name="hireDate"
                   value={employee.hireDate || ''}
                   className="detail-input-basic"
-                  onChange={(e) => handleChange(employee.empId, "hireDate", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "hireDate", e.target.value)}
                 />
               </td>
             </tr>
@@ -140,7 +140,7 @@ function Detail({
                   className="detail-input-basic detail-input-salary"
                   name="salary"
                   value={employee.salary ? employee.salary.toLocaleString() : ''}
-                  onChange={(e) => handleChange(employee.empId, "salary", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "salary", e.target.value)}
                 />
               </td>
               <td className="detail-td-basic detail-td-title">
@@ -155,7 +155,7 @@ function Detail({
                         name="gender"
                         checked={employee.gender === 'M'}
                         value="M"
-                        onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                        onChange={(e) => handleChange(employee._rowId!, "gender", e.target.value)}
                       />
                       {' '}Male
                     </label>
@@ -165,7 +165,7 @@ function Detail({
                         name="gender"
                         checked={employee.gender === 'F'}
                         value="F"
-                        onChange={(e) => handleChange(employee.empId, "gender", e.target.value)}
+                        onChange={(e) => handleChange(employee._rowId!, "gender", e.target.value)}
                       />
                       {' '}Female
                     </label>
@@ -176,7 +176,7 @@ function Detail({
                       id="maritalStatus"
                       name="maritalStatus"
                       checked={employee.married === 'Y'}
-                      onChange={(e) => handleChange(employee.empId, "married", e.target.checked ? 'Y' : 'N')}
+                      onChange={(e) => handleChange(employee._rowId!, "married", e.target.checked ? 'Y' : 'N')}
                     />
                     {' '}Marital Status
                   </label>
@@ -194,7 +194,7 @@ function Detail({
                   name="position"
                   className='detail-select-basic detail-select-position'
                   value={employee.position || ''}
-                  onChange={(e) => handleChange(employee.empId, "position", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "position", e.target.value)}
                 >
                   {/* <option value="10">CEO</option>
                   <option value="20">Director</option>
@@ -218,7 +218,7 @@ function Detail({
                   name="memo"
                   className='detail-textarea-basic'
                   value={employee.memo || ''}
-                  onChange={(e) => handleChange(employee.empId, "memo", e.target.value)}
+                  onChange={(e) => handleChange(employee._rowId!, "memo", e.target.value)}
                 ></textarea>
               </td>
             </tr>

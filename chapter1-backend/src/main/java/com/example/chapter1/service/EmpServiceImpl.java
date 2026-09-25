@@ -50,4 +50,9 @@ public class EmpServiceImpl implements EmpService {
     public void delete(String empId) {
         empMapper.delete(empId);
     }
+
+    @Override 
+    public int getSalaryAvg() {
+        return empMapper.getSalaryAvg();
+    }
 }

@@ -117,4 +117,10 @@
 
     </delete>
 
+    <select id="getSalaryAvg" resultType="int">
+    
+        SELECT ROUND(AVG(salary), 0) FROM ds_emp
+
+    </select>
+
 </mapper>

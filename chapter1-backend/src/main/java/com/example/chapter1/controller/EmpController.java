@@ -49,4 +49,10 @@ public class EmpController {
     public void delete(@PathVariable String empId) {
         empService.delete(empId);
     }
+
+    // salary avg
+    @GetMapping("/salary/avg")
+    public int getSalaryAvg() {
+        return empService.getSalaryAvg();
+    }
 }

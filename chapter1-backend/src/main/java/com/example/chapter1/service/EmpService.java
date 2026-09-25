@@ -15,4 +15,6 @@ public interface EmpService {
 
     void delete(String empId);
 
+    int getSalaryAvg();
+
 }

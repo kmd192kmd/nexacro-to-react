@@ -6,6 +6,29 @@ table,
   box-sizing: border-box;
 }
 
+th,
+td {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d9dce1;
+  text-align: center;
+  white-space: nowrap;
+  /* overflow: hidden;
+  text-overflow: ellipsis; */
+}
+
+/* .tr-salary-avg {
+  position: sticky;
+  bottom: 0;
+  z-index: 999;
+}
+
+.tr-salary-avg td {
+  background-color: #f0f1e6;
+  border-top: 2px solid #d9dce1;
+  
+} */
+
 .dropdown-overlay-container {
   position: relative;
   z-index: 1002;
@@ -64,10 +87,31 @@ h3 {
 }
 
 .table-container {
-  height: 300px;
+  height: 350px;
   overflow-x: auto;
   overflow-y: auto;
   border: 1px solid #d9dce1;
+  scroll-padding-bottom: 36px;
+}
+
+tfoot {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.tfoot-salary-avg {
+  background-color: #f0f1e6;
+  border-top: 2px solid #b0b4bb;
+  height: 26px;
+  font-weight: 600;
+}
+
+.tr-footer-spacer {
+  height: 36px;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
 }
 
 .search-container {
@@ -146,4 +190,9 @@ h3 {
 .gender-radio-wrapper {
   margin-left: 2px;
   margin-right: 10px;
+}
+
+.new-add-row {
+  background-color: #fff9db !important;
+  border-bottom: 2px solid #e9ecef;
 }

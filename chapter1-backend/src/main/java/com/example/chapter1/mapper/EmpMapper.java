@@ -19,4 +19,6 @@ public interface EmpMapper {
 
     int delete(String empId);
 
+    int getSalaryAvg();
+
 }

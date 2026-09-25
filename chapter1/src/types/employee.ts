@@ -1,5 +1,6 @@
 export interface Employee {
-    empId: number;
+    _rowId: string;
+    empId: string;
     empName: string;
     deptCode: string;
     position: string;

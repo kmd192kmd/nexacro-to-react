@@ -24,3 +24,7 @@ export const updateEmployee = (emp) => {
 export const deleteEmployee = (empId) => {
     return commonApi.delete(`/emp/${empId}`);
 };
+
+export const getSalaryAvg = () => {
+    return commonApi.get('/emp/salary/avg');
+};
