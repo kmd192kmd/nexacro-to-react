@@ -1,6 +1,8 @@
 package com.example.chapter1.controller;
 
 import com.example.chapter1.domain.Emp;
+import com.example.chapter1.domain.EmpSaveRequest;
+import com.example.chapter1.domain.EmpSearchRequest;
 import com.example.chapter1.domain.PageResponse;
 import com.example.chapter1.service.EmpService;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class EmpController {
 
     // 전체 조회
     @GetMapping
-    public PageResponse<Emp> findAll(@RequestParam int page, @RequestParam int size) {
-        return empService.findAll(page, size);
+    public PageResponse<Emp> findAll(EmpSearchRequest request) {
+        return empService.findAll(request);
     }
 
     // 상세 조회
@@ -55,4 +57,10 @@ public class EmpController {
     public int getSalaryAvg() {
         return empService.getSalaryAvg();
     }
+
+    @PostMapping("/save")
+    public void saveAll(@RequestBody EmpSaveRequest request) {
+        empService.saveAll(request);
+    }
+
 }

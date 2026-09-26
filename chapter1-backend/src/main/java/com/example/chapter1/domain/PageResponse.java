@@ -6,10 +6,12 @@ public class PageResponse<T> {
     
     private List<T> content;
     private boolean hasMore;
+    private int totalCount;
 
-    public PageResponse(List<T> content, boolean hasMore) {
+    public PageResponse(List<T> content, boolean hasMore, int totalCount) {
         this.content = content;
         this.hasMore = hasMore;
+        this.totalCount = totalCount;
     }
 
     public List<T> getContent() {
@@ -18,5 +20,9 @@ public class PageResponse<T> {
 
     public boolean isHasMore() {
         return hasMore;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
     }
 }

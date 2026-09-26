@@ -1,9 +1,12 @@
 package com.example.chapter1.service;
 
 import com.example.chapter1.domain.Emp;
+import com.example.chapter1.domain.EmpSaveRequest;
+import com.example.chapter1.domain.EmpSearchRequest;
 import com.example.chapter1.domain.PageResponse;
 import com.example.chapter1.mapper.EmpMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,10 +20,12 @@ public class EmpServiceImpl implements EmpService {
     }
 
     @Override
-    public PageResponse<Emp> findAll(int page, int size) {
+    public PageResponse<Emp> findAll(EmpSearchRequest request) {
+        int page = request.getPage();
+        int size = request.getSize();
         int offset = page * size;
 
-        List<Emp> employees = empMapper.findAll(offset, size + 1);
+        List<Emp> employees = empMapper.findAll(request, offset, size + 1);
 
         boolean hasMore = employees.size() > size;
 
@@ -28,7 +33,9 @@ public class EmpServiceImpl implements EmpService {
             employees.remove(size);
         }
 
-        return new PageResponse<>(employees, hasMore);
+        int totalCount = empMapper.countAll(request);
+
+        return new PageResponse<>(employees, hasMore, totalCount);
     }
 
     @Override
@@ -54,5 +61,20 @@ public class EmpServiceImpl implements EmpService {
     @Override 
     public int getSalaryAvg() {
         return empMapper.getSalaryAvg();
+    }
+
+    @Override 
+    @Transactional 
+    public void saveAll(EmpSaveRequest request) {
+        if(request.getCreatedList() != null) {
+            for(Emp emp : request.getCreatedList()) {
+                empMapper.insert(emp);
+            }
+        }
+        if(request.getUpdatedList() != null) {
+            for(Emp emp : request.getUpdatedList()) {
+                empMapper.update(emp);
+            } 
+        }
     }
 }

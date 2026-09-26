@@ -164,6 +164,7 @@ tfoot {
 }
 
 .department-printout {
+  padding-left: 10px;
   width: 160px;
   height: 24px;
 }

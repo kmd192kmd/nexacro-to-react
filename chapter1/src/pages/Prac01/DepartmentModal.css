@@ -1,0 +1,72 @@
+.department-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.department-modal-content {
+  background: #fff;
+  border-radius: 4px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.department-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.department-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.department-modal-body {
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.department-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.department-modal-table th,
+.department-modal-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 13px;
+}
+
+.department-modal-table th {
+  background-color: #fafafa;
+}
+
+.dept-row {
+  cursor: pointer;
+}
+
+.dept-row:hover {
+  background-color: #e6f7ff;
+}

@@ -1,11 +1,8 @@
 import commonApi from "./commonApi"
 
-export const getEmployees = (page, size) => {
+export const getEmployees = (params) => {
     return commonApi.get("/emp", {
-        params: {
-            page,
-            size
-        },
+        params,
     });
 };
 
@@ -27,4 +24,8 @@ export const deleteEmployee = (empId) => {
 
 export const getSalaryAvg = () => {
     return commonApi.get('/emp/salary/avg');
+};
+
+export const saveEmployees = (employees) => {
+    return commonApi.post('/emp/save', employees);
 };

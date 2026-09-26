@@ -1,19 +1,49 @@
 import { createElement, useCallback, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import './MainPage.css'
-import { createEmployee, deleteEmployee, getEmployees, getSalaryAvg, updateEmployee } from "../../api/empApi";
+import { deleteEmployee, getEmployees, getSalaryAvg, saveEmployees } from "../../api/empApi";
 import type { Employee } from '../../types/employee';
 import { Search } from 'lucide-react';
 import EmployeeRow from './EmployeeRow';
 import Detail from './Detail';
+import { DEPARTMENT_MAP } from '../../constants/codeMap';
+import DepartmentModal from './DepartmentModal';
+
+type SortDirection = 'asc' | 'desc' | 'none';
+
+interface SortState {
+  key: keyof Employee | null;
+  direction: SortDirection;
+}
 
 function MainPage() {
   const [emp, setEmp] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [salaryAvg, setSalaryAvg] = useState(0);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [addEmployees, setAddEmployees] = useState<Employee[]>([]);
+
+  const [searchParams, setSearchParams] = useState({
+    department: '',
+    name: '',
+    gender: 'all'
+  });
+
+  const appliedSearchParamsRef = useRef({
+    department: '',
+    name: '',
+    gender: 'all'
+  });
+
+  const [sortState, setSortState] = useState<SortState>({
+    key: null,
+    direction: 'none'
+  });
+
+  const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
 
   const originalEmployeeRef = useRef<Employee | null>(null);
   const originalEmpMapRef = useRef<Map<string, Employee>>(new Map());
@@ -25,38 +55,66 @@ function MainPage() {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<HTMLTableRowElement | null>(null);
 
-  const loadEmployees = async () => {
-    if (loadingRef.current) return;
+  const getCleanSearchParams = () => {
+    const current = appliedSearchParamsRef.current;
+    const params: Record<string, number | string> = {
+      page: pageRef.current,
+      size: 50,
+    };
 
-    if (!hasMoreRef.current) return;
+    if (current.department) {
+      params.deptCode = current.department;
+    }
+
+    if (current.name.trim()) {
+      params.name = current.name.trim();
+    }
+
+    if (current.gender && current.gender !== 'all') {
+      params.gender = current.gender;
+    }
+
+    return params;
+  };
+
+  const loadEmployees = async (isReset = false) => {
+    if (loadingRef.current || (!isReset && !hasMoreRef.current)) return;
 
     loadingRef.current = true;
     setLoading(true);
 
     try {
-      const response = await getEmployees(
-        pageRef.current,
-        50
-      );
+      const params = getCleanSearchParams();
+      const response = await getEmployees(params);
       console.log(response);
       const newEmployees = response.data.content.map((item: Employee) => ({
         ...item,
         _rowId: crypto.randomUUID()
       }));
 
+      if (isReset) {
+        originalEmpMapRef.current.clear();
+      }
+
       newEmployees.forEach((item: Employee) => {
-          originalEmpMapRef.current.set(item._rowId, JSON.parse(JSON.stringify(item)));
+        originalEmpMapRef.current.set(item._rowId, JSON.parse(JSON.stringify(item)));
       });
 
-      setEmp((prev) => [
+      setEmp((prev) => isReset ? newEmployees : [
         ...prev,
         ...newEmployees
       ]);
 
-      setSelectedEmployee((prev) => prev ?? newEmployees[0] ?? null);
-      setSelectedRowId((prev) => prev ?? newEmployees[0]?._rowId ?? null);
+      const firstRow = newEmployees[0] ?? null;
+      setSelectedEmployee((prev) => isReset ? firstRow : (prev ?? firstRow));
+      setSelectedRowId((prev) => isReset ? (firstRow?._rowId ?? null) :
+        (prev ?? firstRow?._rowId ?? null));
 
       hasMoreRef.current = !response.data.last;
+
+      if (isReset) {
+        setTotalCount(response.data.totalCount ?? null);
+      }
 
       pageRef.current += 1;
 
@@ -70,7 +128,12 @@ function MainPage() {
   };
 
   useEffect(() => {
-    loadEmployees();
+
+    const initLoad = async () => {
+      await loadEmployees();
+    };
+
+    initLoad();
   }, []);
 
   useEffect(() => {
@@ -86,11 +149,11 @@ function MainPage() {
     fetchSalaryAvg();
   }, []);
 
-  useEffect(() => {
-    if (selectedEmployee) {
-      originalEmployeeRef.current = JSON.parse(JSON.stringify(selectedEmployee));
-    }
-  }, [selectedEmployee]);
+  // useEffect(() => {
+  //   if (selectedEmployee) {
+  //     originalEmployeeRef.current = JSON.parse(JSON.stringify(selectedEmployee));
+  //   }
+  // }, [selectedEmployee]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -146,28 +209,31 @@ function MainPage() {
       const original = originalEmpMapRef.current.get(item._rowId);
       return original && JSON.stringify(item) !== JSON.stringify(original);
     });
-    
-    if(newEmployeesToSave.length === 0 && modifiedEmployees.length === 0) {
+
+    if (newEmployeesToSave.length === 0 && modifiedEmployees.length === 0) {
       alert("변경된 내용이 없습니다.");
       return;
     }
 
     try {
-      for(const newEmp of newEmployeesToSave) {
-        await createEmployee(newEmp);
-        originalEmpMapRef.current.set(newEmp._rowId, JSON.parse(JSON.stringify(newEmp)));
-      }
+      await saveEmployees({
+        createdList: newEmployeesToSave,
+        updatedList: modifiedEmployees
+      });
 
-      for(const modEmp of modifiedEmployees) {
-        await updateEmployee(modEmp);
-        originalEmpMapRef.current.set(modEmp._rowId, JSON.parse(JSON.stringify(modEmp)));
-      }
+      newEmployeesToSave.forEach((item) => {
+        originalEmpMapRef.current.set(item._rowId, JSON.parse(JSON.stringify(item)));
+      });
 
-      if(newEmployeesToSave.length > 0) {
+      modifiedEmployees.forEach((item) => {
+        originalEmpMapRef.current.set(item._rowId, JSON.parse(JSON.stringify(item)));
+      });
+
+      if (newEmployeesToSave.length > 0) {
         setEmp((prev) => [...newEmployeesToSave, ...prev]);
         setAddEmployees([]);
       }
-      
+
       alert(`저장 성공 (신규: ${newEmployeesToSave.length}건, 수정: ${modifiedEmployees.length}건)`);
 
     } catch (error) {
@@ -261,6 +327,106 @@ function MainPage() {
     setSelectedEmployee(newEmp);
   };
 
+  const handleSearch = () => {
+    appliedSearchParamsRef.current = { ...searchParams };
+
+    pageRef.current = 0;
+    hasMoreRef.current = true;
+    setEmp([]);
+    setAddEmployees([]);
+
+    setSortState({
+      key: null,
+      direction: 'none'
+    });
+
+    loadEmployees(true);
+  };
+
+  const handleSearchIcon = () => {
+    setIsDeptModalOpen(true);
+  };
+
+  const handleSelectDepartment = (deptCode: string) => {
+    setSearchParams((prev) => ({
+      ...prev,
+      department: deptCode,
+    }));
+  };
+
+  const handleSearchParamsChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    setSearchParams((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    console.log(searchParams);
+  };
+
+  const handleSort = (key: keyof Employee) => {
+    let nextDirection: 'asc' | 'desc' | 'none' = 'asc';
+
+    if (sortState.key === key) {
+      if (sortState.direction === 'asc') nextDirection = 'desc';
+      else if (sortState.direction === 'desc') nextDirection = 'none';
+      else nextDirection = 'asc';
+    }
+
+    setSortState({ key: nextDirection === 'none' ? null : key, direction: nextDirection });
+
+    setEmp((prevEmp) => {
+      if (nextDirection === 'none') {
+        return [...prevEmp].sort((a, b) => String(a.empId).localeCompare(String(b.empId), undefined, { numeric: true }));
+      }
+
+      const multiplier = nextDirection === 'asc' ? 1 : -1;
+
+      return [...prevEmp].sort((a, b) => {
+        const aVal = a[key] ?? '';
+        const bVal = b[key] ?? '';
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal - bVal) * multiplier;
+        }
+
+        return String(aVal).localeCompare(String(bVal), undefined, { numeric: true }) * multiplier;
+      });
+    });
+  };
+
+  const renderSortIcon = (key: keyof Employee) => {
+    if (sortState.key !== key || sortState.direction === 'none') {
+      return null;
+    }
+    return (
+      <span style={{ marginLeft: '4px', fontSize: '11px', color: '#2563eb' }}>
+        {sortState.direction === 'asc' ? '▲' : '▼'}
+      </span>
+    );
+  };
+
+  // const sortedEmpList = useMemo(() => {
+  //   if(!sortState.key || sortState.direction === 'none') {
+  //     return emp;
+  //   }
+
+  //   const { key, direction } = sortState;
+  //   const multiplier = direction === 'asc' ? 1 : -1;
+
+  //   return [...emp].sort((a, b) => {
+  //     const aVal = a[key] ?? '';
+  //     const bVal = b[key] ?? '';
+
+  //     if(typeof aVal === 'number' && typeof bVal === 'number') {
+  //       return (aVal - bVal) * multiplier;
+  //     }
+
+  //     return String(aVal).localeCompare(String(bVal)) * multiplier;
+  //   });
+  // }, [emp, sortState]);
+
   // const handleNewChange = (
   //   tempId: number,
   //   field: keyof Employee,
@@ -282,7 +448,7 @@ function MainPage() {
           <h2>Employees</h2>
 
           <div className="button-container">
-            <button className='btn-retrieve'>Retrieve</button>
+            <button className='btn-retrieve' onClick={handleSearch}>Retrieve</button>
             <button onClick={handleAdd}>Add</button>
             <button onClick={handleDelete}>Delete</button>
             <button onClick={handleSave}>Save</button>
@@ -294,35 +460,87 @@ function MainPage() {
             <div className='department-div'><label htmlFor="department">Department</label></div>
             <div className='department-container'>
               <div className='department-input-wrapper'>
-                <input id="department" name="department" className='department-input' />
-                <Search size={18} />
+                <input
+                  id="department-input"
+                  name="department"
+                  className='department-input'
+                  value={searchParams.department || ''}
+                  readOnly
+                />
+                <Search
+                  size={18}
+                  className="search-icon"
+                  onClick={handleSearchIcon}
+                  style={{ cursor: 'pointer' }}
+                />
               </div>
-              <input id="department-printout" className='department-printout' disabled />
+              <input
+                id="department-printout"
+                className='department-printout'
+                value={DEPARTMENT_MAP[searchParams.department] || ''}
+                disabled
+              />
             </div>
+
+            <DepartmentModal
+              isOpen={isDeptModalOpen}
+              onClose={() => setIsDeptModalOpen(false)}
+              onSelect={handleSelectDepartment}
+            />
+
           </div>
 
           <div className="search-item">
             <div className='name-div'><label htmlFor="name">Name</label></div>
-            <input id="name" name="name" className='name-input' />
+            <input
+              id="search-name"
+              name="name"
+              className='name-input'
+              value={searchParams.name || ''}
+              onChange={handleSearchParamsChange}
+            />
           </div>
 
           <div className="search-item gender-item">
             <div className='gender-div'>Gender</div>
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="searchGender" className="gender-radio" value="all" defaultChecked />{' '}All
+                <input
+                  type="radio"
+                  name="gender"
+                  className="gender-radio"
+                  value="all"
+                  checked={searchParams.gender === 'all'}
+                  onChange={handleSearchParamsChange}
+                />{' '}All
               </label>
             </div>
 
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="searchGender" className="gender-radio" value="male" />{' '}Male
+                <input
+                  type="radio"
+                  name="gender"
+                  className="gender-radio"
+                  value="male"
+                  checked={searchParams.gender === 'male'}
+                  onChange={handleSearchParamsChange}
+                />
+                {' '}Male
               </label>
             </div>
 
             <div className='gender-radio-wrapper'>
               <label>
-                <input type="radio" name="searchGender" className="gender-radio" value="female" />{' '}Female
+                <input
+                  type="radio"
+                  name="gender"
+                  className="gender-radio"
+                  value="female"
+                  checked={searchParams.gender === 'female'}
+                  onChange={handleSearchParamsChange}
+                />
+                {' '}Female
               </label>
             </div>
 
@@ -340,16 +558,36 @@ function MainPage() {
           <thead>
             <tr>
               <th>No</th>
-              <th>Name</th>
-              <th>Emp ID</th>
-              <th>Department</th>
-              <th>Position Grade</th>
-              <th>Hire Date</th>
-              <th>Salary</th>
-              <th>Gender</th>
-              <th>Married</th>
-              <th>Skill</th>
-              <th>Hobby</th>
+              <th onClick={() => handleSort('empName')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Name {renderSortIcon('empName')}
+              </th>
+              <th onClick={() => handleSort('empId')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Emp ID {renderSortIcon('empId')}
+              </th>
+              <th onClick={() => handleSort('deptCode')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Department {renderSortIcon('deptCode')}
+              </th>
+              <th onClick={() => handleSort('position')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Position Grade {renderSortIcon('position')}
+              </th>
+              <th onClick={() => handleSort('hireDate')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Hire Date {renderSortIcon('hireDate')}
+              </th>
+              <th onClick={() => handleSort('salary')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Salary {renderSortIcon('salary')}
+              </th>
+              <th onClick={() => handleSort('gender')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Gender {renderSortIcon('gender')}
+              </th>
+              <th onClick={() => handleSort('married')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Married {renderSortIcon('married')}
+              </th>
+              <th onClick={() => handleSort('skill')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Skill {renderSortIcon('skill')}
+              </th>
+              <th onClick={() => handleSort('hobby')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                Hobby {renderSortIcon('hobby')}
+              </th>
             </tr>
           </thead>
 
@@ -360,7 +598,7 @@ function MainPage() {
                 employee={newEmp}
                 index={index}
                 handleChange={handleChange}
-                isSelected={selectedRowId === newEmp._rowId} s
+                isSelected={selectedRowId === newEmp._rowId}
                 onSelect={handleSelect}
                 containerRef={tableContainerRef}
                 className='new-add-row'
@@ -400,7 +638,7 @@ function MainPage() {
 
           <tfoot>
             <tr className='tfoot-salary-avg'>
-              <td></td>
+              <td>{totalCount !== null ? `총 ${totalCount.toLocaleString()}건` : ''}</td>
               <td></td>
               <td></td>
               <td></td>

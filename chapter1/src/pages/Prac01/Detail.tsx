@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import './Detail.css'
 import type { Employee } from '../../types/employee';
 import { HOBBY_MAP, POSITION_OPTIONS, SKILL_OPTIONS } from '../../constants/codeMap';
@@ -152,7 +152,7 @@ function Detail({
                     <label>
                       <input
                         type="radio"
-                        name="gender"
+                        name="detailGender"
                         checked={employee.gender === 'M'}
                         value="M"
                         onChange={(e) => handleChange(employee._rowId!, "gender", e.target.value)}
@@ -162,7 +162,7 @@ function Detail({
                     <label>
                       <input
                         type="radio"
-                        name="gender"
+                        name="detailGender"
                         checked={employee.gender === 'F'}
                         value="F"
                         onChange={(e) => handleChange(employee._rowId!, "gender", e.target.value)}
@@ -300,4 +300,4 @@ function Detail({
   )
 }
 
-export default Detail
+export default memo(Detail);
